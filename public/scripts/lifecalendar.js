@@ -1,24 +1,62 @@
+var data = {
+    noOfWeeks: 1612
+};
+
 var LifeCalendarBox = React.createClass({
     render: function() {
         return (
             <div className="lifeCalendarBox">
-                <h1> Life Calendar </h1>
+                <h4> Life Calendar </h4>
                 <DateBox />
-                <CalendarBox />
+                <CalendarBox  data={data}/>
             </div>);
     }
 });
-
 
 var CalendarBox = React.createClass({
+    getInitialState: function () {
+        return {
+            canvas: {
+                width: 500,
+                height: 800
+            },
+            data: {
+                noOfWeeks: 0
+            }
+        };
+    },
+    componentDidMount: function () {
+        this.initCanvas();
+    },
+    initCanvas: function() {
+        const ctx = this.refs.canvas.getContext('2d');
+        var noOfWeeks = this.props.data.noOfWeeks;
+        var totalWeeks = 0;
+        for (var j = 1; j <= 90; j++) {
+            for (var i = 0; i < 52; i++)  {
+                totalWeeks+=1;
+                if (totalWeeks < noOfWeeks) {
+                    ctx.fillStyle='green';
+                } else {
+                    ctx.fillStyle='red';
+                }
+
+                var startI = (i*6) + 1;
+                var startJ = (j*6) + 1;
+                ctx.fillRect(startI, startJ, 3, 3);
+                if (j % 5 == 0 && i == 51) {
+                    ctx.font="10px";
+                    ctx.fillText(j, startI+10, startJ);
+                }
+            }
+        }
+    },
     render: function () {
-        return (
-            <div>
-                Boxes go here.
-            </div>);
+        return (<canvas ref="canvas"
+            width={this.state.canvas.width}
+            height={this.state.canvas.height} />);
     }
 });
-
 
 var DateBox = React.createClass({
     getInitialState: function () {
@@ -82,10 +120,6 @@ var DateBox = React.createClass({
 });
 
 ReactDOM.render(
-  <LifeCalendarBox />,
+  <LifeCalendarBox data={data}/>,
   document.getElementById('content')
 );
-
-
-// $('#date1 input').autotab_magic().autotab_filter('numeric');
-// $('#date1 input').datepicker()
