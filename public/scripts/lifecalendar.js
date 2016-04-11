@@ -1,34 +1,48 @@
-var data = {
-    noOfWeeks: 1612
+var settings = {
+    canvas: {
+        width: 500,
+        height: 800
+    }
 };
-
 var LifeCalendarBox = React.createClass({
+    getInitialState: function () {
+        return {data: {
+            noOfWeeks: 0
+        }};
+    },
+    getNumberOfWeeksSince: function (day, month, year) {
+        $.ajax({
+            url: this.props.url,
+            dataType: 'json',
+            type: 'GET',
+            data: {day: day, month: month, year: year},
+            success: function onSuccess(res) {
+                this.setState({data: res});
+            }.bind(this),
+            error: function onError(xhr, status, err) {
+                console.log('Error encountered', xhr, status, err);
+            }.bind(this)
+        });
+    },
     render: function() {
         return (
             <div className="lifeCalendarBox">
                 <h4> Life Calendar </h4>
-                <DateBox />
-                <CalendarBox  data={data}/>
+                <DateBox getNumberOfWeeksSince={this.getNumberOfWeeksSince}/>
+                <CalendarBox  data={this.state.data} settings={this.props.settings}/>
             </div>);
     }
 });
 
 var CalendarBox = React.createClass({
-    getInitialState: function () {
-        return {
-            canvas: {
-                width: 500,
-                height: 800
-            },
-            data: {
-                noOfWeeks: 0
-            }
-        };
+    componentDidUpdate: function () {
+        this.drawCanvas();
     },
     componentDidMount: function () {
-        this.initCanvas();
+        this.drawCanvas();
     },
-    initCanvas: function() {
+    drawCanvas: function() {
+        console.log(this.props.data);
         const ctx = this.refs.canvas.getContext('2d');
         var noOfWeeks = this.props.data.noOfWeeks;
         var totalWeeks = 0;
@@ -44,7 +58,7 @@ var CalendarBox = React.createClass({
                 var startI = (i*6) + 1;
                 var startJ = (j*6) + 1;
                 ctx.fillRect(startI, startJ, 3, 3);
-                if (j % 5 == 0 && i == 51) {
+                if (j % 5 === 0 && i === 51) {
                     ctx.font="10px";
                     ctx.fillText(j, startI+10, startJ);
                 }
@@ -53,8 +67,8 @@ var CalendarBox = React.createClass({
     },
     render: function () {
         return (<canvas ref="canvas"
-            width={this.state.canvas.width}
-            height={this.state.canvas.height} />);
+            width={this.props.settings.canvas.width}
+            height={this.props.settings.canvas.height} />);
     }
 });
 
@@ -63,20 +77,16 @@ var DateBox = React.createClass({
         return {day: '', month: '', year: ''};
     },
     handleDayChange: function(e) {
-        console.log('day', e.target.value);
         this.setState({day: e.target.value});
     },
     handleMonthChange: function(e) {
-        console.log('month', e.target.value)
         this.setState({month: e.target.value});
     },
     handleYearChange: function(e) {
-        console.log('year', e.target.value);
         this.setState({year: e.target.value});
     },
     handleSubmit: function(e) {
         e.preventDefault();
-        console.log('Handling the submission');
         var day = this.state.day.trim();
         var month = this.state.month.trim();
         var year = this.state.year.trim();
@@ -85,7 +95,7 @@ var DateBox = React.createClass({
            return;
         }
 
-        console.log("Current state: ", this.state);
+        this.props.getNumberOfWeeksSince(day, month, year);
 
         this.setState({day: 'DD', month: 'MM', year: 'YYYY'});
     },
@@ -120,6 +130,6 @@ var DateBox = React.createClass({
 });
 
 ReactDOM.render(
-  <LifeCalendarBox data={data}/>,
+  <LifeCalendarBox url='/numberOfWeeks' settings={settings}/>,
   document.getElementById('content')
 );
