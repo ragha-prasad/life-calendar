@@ -1,0 +1,8 @@
+{
+    "name": "Life calendar",
+    "description": "Inspired by Tim Urban's talk ",
+    "repository": "https://git.heroku.com/stark-inlet-66165"
+    "logo": "http://node-js-sample.herokuapp.com/node.svg",
+    "keywords": ["node", "express", "static"],
+    "image": "heroku/nodejs"
+}
