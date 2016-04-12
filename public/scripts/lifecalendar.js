@@ -97,7 +97,7 @@ var DateBox = React.createClass({
 
         this.props.getNumberOfWeeksSince(day, month, year);
 
-        this.setState({day: 'DD', month: 'MM', year: 'YYYY'});
+        this.setState({day: '', month: '', year: ''});
     },
     render: function() {
         return (
@@ -123,7 +123,7 @@ var DateBox = React.createClass({
                 onChange={this.handleYearChange} />
             <input
             type="submit"
-            value="Post" />
+            value="Submit" />
             </form>
         );
     }
